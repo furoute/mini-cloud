@@ -12,10 +12,13 @@ export DEBIAN_FRONTEND=noninteractive
 # the free space.
 if growpart /dev/[vs]da 3; then
     pvresize /dev/[vs]da3
-    lvextend --extents +100%FREE --resizefs /dev/pve/root
-    # lvextend -L +10G --resizefs /dev/pve/root
-    # lvextend --extents +100%FREE /dev/pve/data
+    lvextend -L +5G --resizefs /dev/pve/root
+    lvextend --extents +100%FREE /dev/pve/data
 fi
+
+apt install -y dnsmasq
+systemctl stop dnsmasq
+systemctl disable dnsmasq
 
 # configure the network for NATting.
 ifdown vmbr0
@@ -43,6 +46,15 @@ iface vmbr0 inet static
     bridge_fd 0
     # enable IP forwarding. needed to NAT and DNAT.
     post-up   echo 1 >/proc/sys/net/ipv4/ip_forward
+    post-up   dnsmasq -u root --strict-order --bind-interfaces \
+      --pid-file=/var/run/vmbr0.pid \
+      --conf-file= \
+      --except-interface=lo \
+      --interface vmbr0  \
+      --dhcp-range 10.10.10.2,10.10.10.254,255.255.255.0 \
+      --dhcp-option=3,$ip \
+      --dhcp-option=6,192.168.121.1 \
+      --dhcp-leasefile=/var/run/vmbr0.leases
     # NAT through eth0.
     post-up   iptables -t nat -A POSTROUTING -s '$ip/24' ! -d '$ip/24' -o eth0 -j MASQUERADE
     post-down iptables -t nat -D POSTROUTING -s '$ip/24' ! -d '$ip/24' -o eth0 -j MASQUERADE

@@ -12,8 +12,7 @@ $groups = {
 $cluster_vars = {
 	:vcpu => 8,
 	:ram => 16384,
-	:disk_size => 30,
-	:osd_size => '100G'
+	:storage => '200G'
 }
 
 

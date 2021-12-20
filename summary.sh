@@ -8,10 +8,10 @@ fqdn=$(hostname --fqdn)
 export DEBIAN_FRONTEND=noninteractive
 
 # show running containers.
-pct list
+# pct list
 
 # show running VMs.
-qm list
+# qm list
 
 # show versions.
 # uname -a
@@ -22,7 +22,7 @@ qm list
 # pveversion -v
 
 # show the free space.
-df -h /
+# df -h /
 
 # show the proxmox web address.
 cat <<EOF
