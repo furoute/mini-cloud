@@ -57,17 +57,32 @@ Vagrant.configure("2") do |config|
 		end
     end
 
-    # $groups['storage'].each_with_index do |node,i|
-    # 	config.vm.define node do |srv|
-    # 		ip = "10.10.10.#{i+80}"
-    # 		srv.vm.box = $storage_vars[:box]
-    # 		srv.vm.network :private_network,
-    # 			ip: ip,
-				# auto_config: false,
-				# libvirt__dhcp_enabled: false,
-				# libvirt__forward_mode: 'none'
-    # 	end
-    # end
+    $groups['storage'].each_with_index do |node,i|
+    	config.vm.define node do |srv|
+    		srv.vm.box = "centos/7"
+    		
+    		ip = "10.20.20.#{i+80}"
+    		srv.vm.network :private_network,
+    			ip: ip,
+				auto_config: false,
+				libvirt__network_name: 'ceph_network',
+				libvirt__dhcp_enabled: false,
+				libvirt__forward_mode: 'none'
+
+			srv.vm.provider :libvirt do |lv|
+				lv.memory = $storage_vars[:ram]
+				lv.cpus = $storage_vars[:vcpu]
+		    	lv.cpu_mode = 'host-passthrough'
+		    	lv.nested = true
+		    	lv.keymap = 'pt'
+		    	lv.machine_virtual_size = 8
+
+		    	lv.storage :file, :size => $storage_vars[:storage], :path => "#{node}_disk.img", :type => 'qcow2', :cache => 'none'
+			end
+			
+			srv.vm.provision :shell, path: 'provision-target.sh', args: ip
+    	end
+    end
 
     config.group.groups = $groups
 end
