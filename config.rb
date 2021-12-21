@@ -17,7 +17,7 @@ $cluster_vars = {
 
 
 $storage_vars = {
-	:vcpu => 4,
-	:ram => 4096,
-	:disk => 30
+	:vcpu => 2,
+	:ram => 2048,
+	:storage => '10G'
 }
