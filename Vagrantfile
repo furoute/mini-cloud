@@ -64,10 +64,7 @@ Vagrant.configure("2") do |config|
     		ip = "10.20.20.#{i+80}"
     		srv.vm.network :private_network,
     			ip: ip,
-				auto_config: false,
-				libvirt__network_name: 'ceph_network',
-				libvirt__dhcp_enabled: false,
-				libvirt__forward_mode: 'none'
+				libvirt__network_name: 'ceph_network'
 
 			srv.vm.provider :libvirt do |lv|
 				lv.memory = $storage_vars[:ram]

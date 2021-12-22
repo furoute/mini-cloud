@@ -1,7 +1,9 @@
 #!/bin/bash
 set -eux
 
-yum install -y targetcli lvm
+yum install -y targetcli lvm2
+
+IQN=iqn.1993-08.org.debian:01:7747bbc5bef3
 
 if test -b /dev/vdb; then
   parted /dev/vdb mklabel msdos
@@ -16,8 +18,8 @@ if test -b /dev/vdb; then
   targetcli /iscsi/$IQN/tpg1/portals create $1
   
   targetcli /iscsi/$IQN/tpg1/luns create /backstores/block/sanblock1 
-  # targetcli /iscsi/$IQN/tpg1/acls create $IQN
+  targetcli /iscsi/$IQN/tpg1/acls create $IQN
   # targetcli /iscsi/$IQN/tpg1/acls/$IQN set auth userid=$NODE_USERNAME password=$NODE_PASSWORD
   systemctl enable target
   systemctl start target
-else
+fi
